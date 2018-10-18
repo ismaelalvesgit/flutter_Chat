@@ -1,4 +1,3 @@
-import 'package:chat/helpers/Authenticaion_helpers.dart';
 import 'package:chat/helpers/Firestore_helpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,17 +15,16 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
-  final _authHelpers = AuthHelpers();
 
-  final _firebaseAuth = FirebaseAuth.instance;
-  final _menssage = MessageHelpers();
+
+  final _auth = FirebaseAuth.instance;
 
   String _user;
   @override
   void initState() {
     super.initState();
 
-    _firebaseAuth.currentUser().then((user) {
+    _auth.currentUser().then((user) {
       _user = user.email;
     });
   }
@@ -127,7 +125,11 @@ class _TextComposerState extends State<TextComposer> {
   }
 
   void _reset(){
-    _msgController.clear();
+    setState(() {
+      _msgController.clear();
+      _isComposing = false;
+    });
+
   }
 
   @override

@@ -1,13 +1,13 @@
 import 'package:chat/helpers/Authenticaion_helpers.dart';
+import 'package:chat/ui/Users_Page.dart';
 import 'package:flutter/material.dart';
 
 
 class LoginPage extends StatefulWidget {
 
-  LoginPage({Key key, this.title, this.auth, this.onSignIn}) : super(key: key);
+  LoginPage({Key key, this.title, this.onSignIn}) : super(key: key);
 
   final String title;
-  final BaseAuth auth;
   final VoidCallback onSignIn;
 
   @override
@@ -18,14 +18,17 @@ class _LoginPageState extends State<LoginPage> {
 
   final _authHelpers = AuthHelpers();
 
+  final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Stack(
         children: <Widget>[
           Image.asset(
@@ -75,8 +78,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     style: TextStyle(color: Colors.white, fontSize: 25.0),
                     validator: (value) {
-                      if (value.isEmpty) {
-                        return "Email invalido!";
+                      if (value.isEmpty && value.length < 6) {
+                        return "Senha invalido!";
                       }
                     },
                   ),
@@ -88,10 +91,17 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: RaisedButton(
                       onPressed: (){
+                        if(_formKey.currentState.validate())
                         _authHelpers.signIn(_emailController.text, _passwordController.text).then((any){
-                          Navigator.pushReplacementNamed(context, "/users");
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> UsersPage()));
+                        }).catchError((e){
+                          _scaffoldKey.currentState.showSnackBar(
+                              SnackBar(content: Text("erro ao fazer login"),
+                                backgroundColor: Colors.redAccent,
+                                duration: Duration(seconds: 2),
+                              )
+                          );
                         });
-
                       },
                       color: Colors.blue,
                       child: Text("Submit", style: TextStyle(color: Colors.white),),
